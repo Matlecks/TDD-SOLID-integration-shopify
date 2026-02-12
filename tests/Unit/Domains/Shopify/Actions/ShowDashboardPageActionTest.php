@@ -75,12 +75,6 @@ class ShowDashboardPageActionTest extends TestCase
 
         $this->assertCount(1, $data['recentProducts']);
         $product = $data['recentProducts']->first();
-
-        // Эти проверки нужно будет адаптировать под реальную логику приложения
-        // $this->assertEquals(9.99, $product->price);
-        // $this->assertEquals(24.99, $product->compare_at_price);
-        // $this->assertEquals(18, $product->total_inventory);
-        // $this->assertEquals('https://example.com/image.jpg', $product->image);
     }
 
     #[Test]
@@ -96,7 +90,6 @@ class ShowDashboardPageActionTest extends TestCase
             'email' => 'test@example.com',
         ]);
 
-        // Create 10 products
         for ($i = 1; $i <= 10; $i++) {
             Product::create([
                 'shopify_shop_id' => $shop->id,
@@ -147,12 +140,6 @@ class ShowDashboardPageActionTest extends TestCase
         // Assert
         $this->assertCount(1, $data['recentProducts']);
         $product = $data['recentProducts']->first();
-
-        // Эти проверки нужно будет адаптировать под реальную логику приложения
-        // $this->assertEquals(0, $product->price);
-        // $this->assertEquals(0, $product->compare_at_price);
-        // $this->assertEquals(0, $product->total_inventory);
-        // $this->assertNull($product->image);
     }
 
     #[Test]

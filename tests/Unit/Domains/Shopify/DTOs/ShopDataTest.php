@@ -74,7 +74,6 @@ class ShopDataTest extends TestCase
         $this->assertEquals(['read_products', 'write_products'], $array['scopes']);
         $this->assertTrue($array['is_active']);
 
-        // Проверяем, что токен был зашифрован
         $this->assertNotEquals('test_token', $array['access_token']);
         $this->assertIsString($array['access_token']);
     }

@@ -31,7 +31,6 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             });
 
-        // Привязка для ShopifyProductService
         $this->app->bind(ShopifyProductService::class, function ($app) {
             return new ShopifyProductService(
                 client: new Client([
@@ -41,25 +40,6 @@ class AppServiceProvider extends ServiceProvider
                 authService: $app->make(ShopifyAuthService::class)
             );
         });
-
-        // Привязка для Actions
-        $this->app->bind(CreateProductAction::class, function ($app) {
-            return new CreateProductAction(
-                shopifyService: $app->make(ShopifyProductService::class)
-            );
-        });
-
-//        $this->app->bind(UpdateProductAction::class, function ($app) {
-//            return new UpdateProductAction(
-//                shopifyService: $app->make(ShopifyProductService::class)
-//            );
-//        });
-//
-//        $this->app->bind(DeleteProductAction::class, function ($app) {
-//            return new DeleteProductAction(
-//                shopifyService: $app->make(ShopifyProductService::class)
-//            );
-//        });
     }
 
     /**

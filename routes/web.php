@@ -18,6 +18,5 @@ Route::get('/install', ShowInstallPageAction::class)
 Route::get('/auth/install', InstallShopifyAppAction::class)
     ->name('shopify.install');
 
-// Маршрут для OAuth callback
 Route::get('/auth/callback', HandleShopifyCallbackAction::class)
     ->name('shopify.callback');
