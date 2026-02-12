@@ -34,7 +34,7 @@ class ShopifyAuthService
             'scope' => $scopes,
             'redirect_uri' => $this->redirectUri,
             'state' => $state,
-            'grant_options' => [], // For online access mode
+            'grant_options' => [],
         ]);
 
         return "https://{$shopDomain}/admin/oauth/authorize?{$queryParams}";

@@ -2,8 +2,6 @@
 
 namespace App\Domains\Shopify\DTOs;
 
-use Illuminate\Support\Facades\Log;
-
 class ShopData
 {
     public function __construct(
@@ -20,7 +18,7 @@ class ShopData
     ) {}
 
     /**
-     * Создает DTO из ответа Shopify API
+     * Creates a DTO from a Shopify API response
      */
     public static function fromApiResponse(array $shopData, array $accessData): self
     {
@@ -39,7 +37,7 @@ class ShopData
     }
 
     /**
-     * Конвертирует DTO в массив для модели
+     * Converts DTO to an array for the model
      */
     public function toArray(): array
     {

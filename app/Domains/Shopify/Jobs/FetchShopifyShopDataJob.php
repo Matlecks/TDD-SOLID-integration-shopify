@@ -65,7 +65,6 @@ class FetchShopifyShopDataJob implements ShouldQueue
      */
     private function fetchAndSyncShopData(string $shopDomain, string $accessToken, string $apiVersion): void
     {
-        // 1. First fetch shop data from Shopify API
         $response = Http::withOptions([
             'verify' => false,
             'timeout' => 30,
@@ -84,13 +83,11 @@ class FetchShopifyShopDataJob implements ShouldQueue
             throw new \Exception('Invalid shop data received from Shopify API');
         }
 
-        // 2. Check if shop exists in database
         $existingShop = ShopifyShop::where('shopify_shop_id', $shopData['id'])
             ->orWhere('domain', $shopData['domain'])
             ->orWhere('shopify_domain', $shopData['myshopify_domain'] ?? null)
             ->first();
 
-        // 3. Prepare shop data for update/create
         $shopAttributes = [
             'shopify_shop_id' => $shopData['id'],
             'domain' => $shopData['domain'],
@@ -114,7 +111,6 @@ class FetchShopifyShopDataJob implements ShouldQueue
         ];
 
         if ($existingShop) {
-            // Update existing shop
             $existingShop->update($shopAttributes);
 
             Log::info('Shopify shop updated successfully', [
@@ -125,8 +121,8 @@ class FetchShopifyShopDataJob implements ShouldQueue
 
             $this->logInfo("Shop updated: {$existingShop->domain}");
         } else {
-            // Create new shop with existing access token
-            $shopAttributes['access_token'] = $this->shop->access_token; // Preserve existing encrypted token
+
+            $shopAttributes['access_token'] = $this->shop->access_token;
             $shopAttributes['scopes'] = $this->shop->scopes ?? config('shopify.scopes', []);
             $shopAttributes['installed_at'] = now();
 

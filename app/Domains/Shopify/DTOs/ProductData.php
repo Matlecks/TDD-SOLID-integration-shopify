@@ -3,7 +3,6 @@
 namespace App\Domains\Shopify\DTOs;
 
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 
 class ProductData
@@ -33,7 +32,7 @@ class ProductData
     ) {}
 
     /**
-     * Создает DTO из массива данных
+     * Creates a DTO from an array of data
      *
      * @param array $data
      * @return self
@@ -41,10 +40,9 @@ class ProductData
      */
     public static function fromArray(array $data): self
     {
-        // Валидация обязательных полей
         if (empty($data['title'])) {
             throw ValidationException::withMessages([
-                'title' => 'Название продукта обязательно для заполнения'
+                'title' => 'Product name is required'
             ]);
         }
 
@@ -74,7 +72,7 @@ class ProductData
     }
 
     /**
-     * Создает DTO из данных Shopify API
+     * Creates a DTO from Shopify API data
      *
      * @param array $shopifyProduct
      * @return self
@@ -109,50 +107,7 @@ class ProductData
     }
 
     /**
-     * Преобразует DTO в массив для Shopify API
-     *
-     * @return array
-     */
-    public function toShopifyArray(): array
-    {
-        $product = [
-            'title' => $this->title,
-            'body_html' => $this->body_html,
-            'vendor' => $this->vendor,
-            'product_type' => $this->product_type,
-            'status' => $this->status,
-            'handle' => $this->handle,
-            'tags' => $this->tags,
-        ];
-
-        if ($this->id) {
-            $product['id'] = $this->id;
-        }
-
-        if ($this->published_at) {
-            $product['published_at'] = $this->published_at->toIso8601String();
-        }
-
-        if (!empty($this->variants)) {
-            $product['variants'] = $this->variants;
-        }
-
-        if (!empty($this->images)) {
-            $product['images'] = $this->images;
-        }
-
-        if (!empty($this->options)) {
-            $product['options'] = $this->options;
-        }
-
-        // Удаляем null значения
-        return array_filter($product, function ($value) {
-            return !is_null($value) && $value !== [];
-        });
-    }
-
-    /**
-     * Преобразует DTO в массив для локального сохранения
+     * Converts DTO to array for local storage
      *
      * @return array
      */
@@ -180,7 +135,7 @@ class ProductData
     }
 
     /**
-     * Форматирует теги
+     * Formats tags
      *
      * @param string|array|null $tags
      * @return string|null
@@ -199,7 +154,7 @@ class ProductData
     }
 
     /**
-     * Парсит дату публикации
+     * Parses the publication date
      *
      * @param string|Carbon|null $publishedAt
      * @return Carbon|null
@@ -222,7 +177,7 @@ class ProductData
     }
 
     /**
-     * Форматирует варианты
+     * Formats options
      *
      * @param array $variants
      * @return array
@@ -253,7 +208,7 @@ class ProductData
     }
 
     /**
-     * Форматирует изображения
+     * Formats images
      *
      * @param array $images
      * @return array
@@ -286,7 +241,7 @@ class ProductData
     }
 
     /**
-     * Форматирует опции
+     * Formats options
      *
      * @param array $options
      * @return array
@@ -312,7 +267,7 @@ class ProductData
     }
 
     /**
-     * Обновляет DTO новыми данными
+     * Updates the DTO with new data
      *
      * @param array $data
      * @return self
@@ -323,99 +278,5 @@ class ProductData
             $this->toArray(),
             $data
         ));
-    }
-
-    /**
-     * Проверяет, опубликован ли продукт
-     *
-     * @return bool
-     */
-    public function isPublished(): bool
-    {
-        return $this->status === 'active' && !is_null($this->published_at);
-    }
-
-    /**
-     * Проверяет, есть ли у продукта варианты
-     *
-     * @return bool
-     */
-    public function hasVariants(): bool
-    {
-        return count($this->variants) > 0;
-    }
-
-    /**
-     * Получает первый вариант продукта
-     *
-     * @return array|null
-     */
-    public function getFirstVariant(): ?array
-    {
-        return $this->variants[0] ?? null;
-    }
-
-    /**
-     * Получает основное изображение продукта
-     *
-     * @return array|null
-     */
-    public function getMainImage(): ?array
-    {
-        foreach ($this->images as $image) {
-            if (($image['position'] ?? 0) === 1) {
-                return $image;
-            }
-        }
-
-        return $this->images[0] ?? null;
-    }
-
-    /**
-     * Создает DTO для простого продукта (без вариантов)
-     *
-     * @param array $data
-     * @return self
-     */
-    public static function createSimple(array $data): self
-    {
-        return self::fromArray(array_merge($data, [
-            'variants' => [
-                [
-                    'price' => $data['price'] ?? null,
-                    'compare_at_price' => $data['compare_at_price'] ?? null,
-                    'sku' => $data['sku'] ?? null,
-                    'inventory_quantity' => $data['inventory_quantity'] ?? 0,
-                    'barcode' => $data['barcode'] ?? null,
-                    'weight' => $data['weight'] ?? null,
-                    'weight_unit' => $data['weight_unit'] ?? 'kg',
-                ]
-            ],
-            'options' => [
-                [
-                    'name' => 'Title',
-                    'values' => ['Default Title'],
-                    'position' => 1,
-                ]
-            ],
-            'shopify_data' => $data['shopify_data'] ?? null,
-        ]));
-    }
-
-    /**
-     * Создает DTO для черновика продукта
-     *
-     * @param string $title
-     * @return self
-     */
-    public static function createDraft(string $title): self
-    {
-        return self::fromArray([
-            'title' => $title,
-            'status' => 'draft',
-            'published_at' => null,
-            'inventory_quantity' => 0,
-            'shopify_data' => null,
-        ]);
     }
 }

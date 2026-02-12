@@ -19,24 +19,19 @@ class ShowDashboardPageAction extends Controller
         $shop = ShopifyShop::first();
 
         if (!$shop) {
-            // If no shop is installed yet, return empty data
             return view('shopify.dashboard', [
                 'recentProducts' => collect([]),
                 'shop' => null,
             ]);
         }
 
-        // Recent products
         $recentProducts = Product::where('shopify_shop_id', $shop->id)
             ->latest()
             ->take(5)
             ->get();
 
         return view('shopify.dashboard', [
-            // Collections
             'recentProducts' => $recentProducts,
-
-            // Shop information
             'shop' => $shop,
         ]);
     }

@@ -27,33 +27,6 @@ class StoreProductRequest extends FormRequest
             'shopify_created_at' => ['sometimes', 'nullable', 'date'],
             'shopify_updated_at' => ['sometimes', 'nullable', 'date'],
 
-            // Variants
-            'variants' => ['sometimes', 'array'],
-            'variants.*.shopify_id' => ['sometimes', 'string', 'max:255'],
-            'variants.*.title' => ['sometimes', 'string', 'max:255'],
-            'variants.*.price' => ['sometimes', 'numeric', 'min:0'],
-            'variants.*.sku' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'variants.*.position' => ['sometimes', 'integer'],
-            'variants.*.inventory_policy' => ['sometimes', 'string', 'max:255'],
-            'variants.*.fulfillment_service' => ['sometimes', 'string', 'max:255'],
-            'variants.*.inventory_management' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'variants.*.option1' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'variants.*.option2' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'variants.*.option3' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'variants.*.taxable' => ['sometimes', 'boolean'],
-            'variants.*.weight' => ['sometimes', 'numeric', 'min:0'],
-            'variants.*.weight_unit' => ['sometimes', 'string', 'max:10'],
-            'variants.*.inventory_quantity' => ['sometimes', 'integer', 'min:0'],
-
-            // Images
-            'images' => ['sometimes', 'array'],
-            'images.*.shopify_id' => ['sometimes', 'string', 'max:255'],
-            'images.*.src' => ['required_with:images', 'string', 'url'],
-            'images.*.position' => ['sometimes', 'integer'],
-            'images.*.alt' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'images.*.width' => ['sometimes', 'integer'],
-            'images.*.height' => ['sometimes', 'integer'],
-
             // Options
             'options' => ['sometimes', 'array'],
             'options.*.shopify_id' => ['sometimes', 'string', 'max:255'],

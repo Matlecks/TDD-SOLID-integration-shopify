@@ -29,19 +29,16 @@ class HandleShopifyCallbackAction extends Controller
     {
         $validatedData = $request->validated();
 
-        // 1. Obtaining an access token
         $accessData = $this->shopifyAuthService->getAccessData(
             $validatedData['shop'],
             $validatedData['code']
         );
 
-        // 2. Getting information about the store
         $shopData = $this->fetchShopData(
             $validatedData['shop'],
             $accessData['access_token']
         );
 
-        // 3. Create a DTO and save the store
         $shopDto = ShopData::fromApiResponse($shopData, $accessData);
 
         return $this->persistShop($shopDto);

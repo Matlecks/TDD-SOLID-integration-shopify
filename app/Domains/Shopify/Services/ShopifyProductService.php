@@ -265,7 +265,6 @@ class ShopifyProductService
                 'option3' => $variant['option3'] ?? null,
             ];
 
-            // Удаляем null значения
             return array_filter($formatted, function ($value) {
                 return !is_null($value);
             });

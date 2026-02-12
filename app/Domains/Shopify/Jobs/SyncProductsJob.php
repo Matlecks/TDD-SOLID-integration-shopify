@@ -16,9 +16,9 @@ class SyncProductsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $timeout = 600; // 10 минут
+    public int $timeout = 600;
     public int $tries = 3;
-    public int $backoff = 5; // секунды между повторами
+    public int $backoff = 5;
 
     public function __construct(
         public ?ShopifyShop $shop = null,
@@ -45,7 +45,6 @@ class SyncProductsJob implements ShouldQueue
                 $filters['since_id'] = $this->sinceId;
             }
 
-            // Получаем товары из Shopify
             $shopifyProducts = $shopifyService->listProducts($this->shop, $filters);
 
             if (empty($shopifyProducts)) {
@@ -55,25 +54,14 @@ class SyncProductsJob implements ShouldQueue
                 return;
             }
 
-
-
-            // Обрабатываем каждый товар
             foreach ($shopifyProducts as $shopifyProduct) {
-
-                Log::debug('Shopify $shopifyProduct', [
-                    '$shopifyProduct' => json_encode($shopifyProduct, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-                ]);
-
-
                 $productData = ProductData::fromShopify($shopifyProduct);
                 $this->syncProduct($productData);
             }
 
-            // Получаем последний ID для следующей страницы
             $lastProduct = end($shopifyProducts);
             $nextSinceId = $lastProduct['id'] ?? null;
 
-            // Если получили полную страницу, запускаем следующую
             if (count($shopifyProducts) >= $this->limit && $nextSinceId) {
                 SyncProductsJob::dispatch(
                     $this->shop,
@@ -97,7 +85,6 @@ class SyncProductsJob implements ShouldQueue
                 'trace' => $e->getTraceAsString()
             ]);
 
-            // Пробрасываем исключение для повторной попытки
             throw $e;
         }
     }
@@ -105,7 +92,6 @@ class SyncProductsJob implements ShouldQueue
     private function syncProduct(ProductData $productData): void
     {
         try {
-            // Обновляем или создаем товар
             $product = Product::updateOrCreate(
                 [
                     'shopify_shop_id' => $this->shop->id,
@@ -123,12 +109,6 @@ class SyncProductsJob implements ShouldQueue
                 ]
             );
 
-            // Синхронизируем варианты
-            $this->syncVariants($product, $productData->variants);
-
-            // Синхронизируем изображения
-            $this->syncImages($product, $productData->images);
-
             Log::info('Product synced successfully', [
                 'shop_id' => $this->shop->id,
                 'product_id' => $product->id,
@@ -145,45 +125,6 @@ class SyncProductsJob implements ShouldQueue
             ]);
 
             throw $e;
-        }
-    }
-
-    private function syncVariants(Product $product, array $variants): void
-    {
-        // Удаляем старые варианты
-        $product->variants()->delete();
-
-        // Создаем новые варианты
-        foreach ($variants as $variantData) {
-            $product->variants()->create([
-                'shopify_variant_id' => $variantData['id'] ?? null,
-                'title' => $variantData['title'] ?? '',
-                'price' => $variantData['price'] ?? 0,
-                'sku' => $variantData['sku'] ?? null,
-                'inventory_quantity' => $variantData['inventory_quantity'] ?? 0,
-                'inventory_item_id' => $variantData['inventory_item_id'] ?? null,
-                'option1' => $variantData['option1'] ?? null,
-                'option2' => $variantData['option2'] ?? null,
-                'option3' => $variantData['option3'] ?? null,
-                'shopify_data' => $variantData,
-            ]);
-        }
-    }
-
-    private function syncImages(Product $product, array $images): void
-    {
-        // Удаляем старые изображения
-        $product->images()->delete();
-
-        // Создаем новые изображения
-        foreach ($images as $imageData) {
-            $product->images()->create([
-                'shopify_image_id' => $imageData['id'] ?? null,
-                'src' => $imageData['src'] ?? null,
-                'position' => $imageData['position'] ?? 0,
-                'alt' => $imageData['alt'] ?? null,
-                'shopify_data' => $imageData,
-            ]);
         }
     }
 }

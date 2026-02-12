@@ -44,7 +44,6 @@ class SyncShopifyProducts extends Command
 
         foreach ($shops as $shop) {
             try {
-                // Диспатчим первый джоб для каждого магазина
                 SyncProductsJob::dispatch($shop, 1, null, 50);
 
                 Log::info('Dispatched SyncProductsJob for shop', [
